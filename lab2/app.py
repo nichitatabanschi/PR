@@ -140,3 +140,35 @@ if __name__ == '__main__':
 #   "color": "White"
 # }
 
+
+#READ Cars with Pagination (GET request)
+#http://127.0.0.1:5000/cars?page=1&limit=5
+
+# {
+#   "cars": [
+#     {
+#       "id": 1,
+#       "offer_type": "Sale",
+#       "brand": "Toyota",
+#       "model": "Corolla",
+#       "generation": "E210",
+#       "registration": "2021",
+#       "condition": "New",
+#       "country_origin": "Japan",
+#       "manufacturing_year": "2021",
+#       "price": 20000,
+#       "currency": "USD",
+#       "mileage": "0 km",
+#       "engine_capacity": "1.8 L",
+#       "power_hp": 139,
+#       "fuel_type": "Petrol",
+#       "transmission": "Automatic",
+#       "color": "White"
+#     }
+#   ],
+#   "page": 1,
+#   "limit": 5,
+#   "total_pages": 1,
+#   "total_cars": 1
+# }
+
