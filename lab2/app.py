@@ -8,11 +8,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-
-@app.before_first_request
-def create_tables():
+# Directly create tables here without `before_first_request`
+with app.app_context():
     db.create_all()
-
 
 # CREATE
 @app.route('/cars', methods=['POST'])
@@ -40,7 +38,6 @@ def create_car():
     db.session.commit()
     return jsonify({'message': 'Car created'}), 201
 
-
 # READ with Pagination
 @app.route('/cars', methods=['GET'])
 def get_cars():
@@ -60,7 +57,6 @@ def get_cars():
         'total_cars': total_cars
     }
     return jsonify(response)
-
 
 # UPDATE
 @app.route('/cars/<int:id>', methods=['PUT'])
@@ -90,7 +86,6 @@ def update_car(id):
     db.session.commit()
     return jsonify({'message': 'Car updated'})
 
-
 # DELETE
 @app.route('/cars/<int:id>', methods=['DELETE'])
 def delete_car(id):
@@ -101,7 +96,6 @@ def delete_car(id):
     db.session.delete(car)
     db.session.commit()
     return jsonify({'message': 'Car deleted'})
-
 
 # UPLOAD FILE
 @app.route('/upload', methods=['POST'])
@@ -121,6 +115,28 @@ def upload_file():
         except json.JSONDecodeError:
             return jsonify({'message': 'Invalid JSON file format'}), 400
 
-
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+#Testing the API in Postman
+#http://127.0.0.1:5000/cars method POST
+# #{
+#   "offer_type": "Sale",
+#   "brand": "Toyota",
+#   "model": "Corolla",
+#   "generation": "E210",
+#   "registration": "2021",
+#   "condition": "New",
+#   "country_origin": "Japan",
+#   "manufacturing_year": "2021",
+#   "price": 20000,
+#   "currency": "USD",
+#   "mileage": "0 km",
+#   "engine_capacity": "1.8 L",
+#   "power_hp": 139,
+#   "fuel_type": "Petrol",
+#   "transmission": "Automatic",
+#   "color": "White"
+# }
+
