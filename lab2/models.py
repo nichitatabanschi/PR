@@ -42,3 +42,4 @@ class Car(db.Model):
             "transmission": self.transmission,
             "color": self.color
         }
+    ##

@@ -171,4 +171,12 @@ if __name__ == '__main__':
 #   "total_pages": 1,
 #   "total_cars": 1
 # }
+#UPDATE a Car (PUT request)
+#http://127.0.0.1:5000/cars/1
+# {
+#   "price": 21000,
+#   "mileage": "500 km",
+#   "color": "Blue"
+# }
+
 
