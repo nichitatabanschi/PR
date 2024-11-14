@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_socketio import SocketIO, join_room, leave_room, send
 from models import db, Car
 import json
 
@@ -7,8 +8,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cars.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+# Configure SocketIO with CORS settings for local testing
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Directly create tables here without `before_first_request`
+# Create tables if they don't exist
 with app.app_context():
     db.create_all()
 
@@ -115,68 +118,28 @@ def upload_file():
         except json.JSONDecodeError:
             return jsonify({'message': 'Invalid JSON file format'}), 400
 
+# WebSocket Chat Room
+@socketio.on('join')
+def handle_join(data):
+    username = data['username']
+    room = data['room']
+    join_room(room)
+    send(f"{username} has entered the room.", to=room)
+
+@socketio.on('leave')
+def handle_leave(data):
+    username = data['username']
+    room = data['room']
+    leave_room(room)
+    send(f"{username} has left the room.", to=room)
+
+@socketio.on('message')
+def handle_message(data):
+    room = data['room']
+    message = data['message']
+    username = data['username']
+    send(f"{username}: {message}", to=room)
+
 if __name__ == '__main__':
-    app.run(debug=True)
-
-
-#Testing the API in Postman
-#http://127.0.0.1:5000/cars method POST
-# #{
-#   "offer_type": "Sale",
-#   "brand": "Toyota",
-#   "model": "Corolla",
-#   "generation": "E210",
-#   "registration": "2021",
-#   "condition": "New",
-#   "country_origin": "Japan",
-#   "manufacturing_year": "2021",
-#   "price": 20000,
-#   "currency": "USD",
-#   "mileage": "0 km",
-#   "engine_capacity": "1.8 L",
-#   "power_hp": 139,
-#   "fuel_type": "Petrol",
-#   "transmission": "Automatic",
-#   "color": "White"
-# }
-
-
-#READ Cars with Pagination (GET request)
-#http://127.0.0.1:5000/cars?page=1&limit=5
-
-# {
-#   "cars": [
-#     {
-#       "id": 1,
-#       "offer_type": "Sale",
-#       "brand": "Toyota",
-#       "model": "Corolla",
-#       "generation": "E210",
-#       "registration": "2021",
-#       "condition": "New",
-#       "country_origin": "Japan",
-#       "manufacturing_year": "2021",
-#       "price": 20000,
-#       "currency": "USD",
-#       "mileage": "0 km",
-#       "engine_capacity": "1.8 L",
-#       "power_hp": 139,
-#       "fuel_type": "Petrol",
-#       "transmission": "Automatic",
-#       "color": "White"
-#     }
-#   ],
-#   "page": 1,
-#   "limit": 5,
-#   "total_pages": 1,
-#   "total_cars": 1
-# }
-#UPDATE a Car (PUT request)
-#http://127.0.0.1:5000/cars/1
-# {
-#   "price": 21000,
-#   "mileage": "500 km",
-#   "color": "Blue"
-# }
-
-
+    # Enable allow_unsafe_werkzeug=True for development
+    socketio.run(app, debug=True, port=5000, allow_unsafe_werkzeug=True)
